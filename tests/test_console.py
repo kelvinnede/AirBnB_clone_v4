@@ -1,5 +1,6 @@
 #!/usr/bin/python3
-""" A unit test module for the console module.
+"""
+A unit test module for the console module.
 """
 import MySQLdb
 import os
