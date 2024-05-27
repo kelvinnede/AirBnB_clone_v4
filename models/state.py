@@ -1,34 +1,37 @@
 #!/usr/bin/python3
-""" State Module for HBNB project """
-import os
+'''
+    Implementation of the State class
+'''
+from os import getenv
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
-
 from models.base_model import BaseModel, Base
-from models.city import City
+import models
 
 
 class State(BaseModel, Base):
-    """State class inherits from BaseModel and Base"""
-    __tablename__ = 'states'
-    name = Column(
-        String(128),
-        nullable=False
-    ) if os.getenv('HBNB_TYPE_STORAGE') == 'db' else ''
+    '''
+        Implementation for the State.
+        Create relationship between class State (parent) to City (child)
+    '''
+    __tablename__ = "states"
 
-    if os.getenv('HBNB_TYPE_STORAGE') == 'db':
-        cities = relationship(
-            'City',
-            cascade='all, delete, delete-orphan',
-            backref='state'
-        )
+    if getenv("HBNB_TYPE_STORAGE") == "db":
+        name = Column(String(128), nullable=False)
+        cities = relationship("City", backref="state",
+                              cascade="all, delete, delete-orphan")
     else:
+        name = ""
+
         @property
         def cities(self):
-            """Returns the cities in this State instance"""
-            from models import storage
-            cities_in_state = []
-            for value in storage.all(City).values():
-                if value.state_id == self.id:
-                    cities_in_state.append(value)
-            return cities_in_state
+            '''
+                Return list of city instances if City.state_id==current
+                State.id
+                FileStorage relationship between State and City
+            '''
+            list_cities = []
+            for city in models.storage.all("City").values():
+                if city.state_id == self.id:
+                    list_cities.append(city)
+            return list_cities
